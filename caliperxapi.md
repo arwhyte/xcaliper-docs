@@ -4,10 +4,11 @@
 
 
 
-## The challenge of xAPI
+### xAPI challenges
 
+#### Discerning types
 
-1. *Discerning types*.  Statement and object typing is limited and map poorly to Caliper.  Unlike Caliper, which distinguishes between `Event` types for descriptive purposes and as an aid to querying (e.g., `AssessmentEvent`, `MessageEvent` etc.), xAPI Statement "types" can be defined optionally by specifying a `context.contextActivities` object typed with an array of one or more "category" object values.  Each category is defined as "an Activity used to categorize the Statement" which in practice is used to link a Statement to a profile such as cmi5 in order to facilitate Statement search and retrieval (see cmi5 9.6.2 [contextActivities](https://github.com/AICC/CMI-5_Spec_Current/blob/quartz/cmi5_spec.md#context_activities).  
+Statement and object typing is limited and map poorly to Caliper.  Unlike Caliper, which distinguishes between `Event` types for descriptive purposes and as an aid to querying (e.g., `AssessmentEvent`, `MessageEvent` etc.), xAPI Statement "types" can be defined optionally by specifying a `context.contextActivities` object typed with an array of one or more "category" object values.  Each category is defined as "an Activity used to categorize the Statement" which in practice is used to link a Statement to a profile such as cmi5 in order to facilitate Statement search and retrieval (see cmi5 9.6.2 [contextActivities](https://github.com/AICC/CMI-5_Spec_Current/blob/quartz/cmi5_spec.md#context_activities).  
 
 Statement "types" can also be inferred from the `object.objectType` property.  Available `objectType` values are limited to "Activity", "Agent", "Group", "SubStatement" and "StatementRef".  If an xAPI `object` is typed as an `Activity` it may include an optional activity `definition` object property that provides additional metadata regarding the activity including a `type` IRI.  This approach results in an unnecessarily awkward if not overly complex JSON representation of an xAPI `object` when compared to a matching Caliper representation, which is decidely more compact and does not require resorting to its optional `extensions` property to reference basic information like a due date:  
 
@@ -46,11 +47,21 @@ Caliper Assignment `object` (matching properties only; other available optional 
 
 Second, the decision to infer a Statement type via its `object` leads to a conflation of the `object` of an interaction with the activity itself.  An xAPI Statement `object` is described simultaneously as both "the thing that was acted on" (e.g., an essay)--which aligns with the Caliper notion of an `object`--but also as the activity itself as in "Jeff wrote an essay about hiking."  Activity as a term is used very loosely throughout the xAPI specification and related profiles and recipes.  I find this confusing, especially when in relation to the `object` of a Statement.  This contrasts with Caliper where an `object` is defined narrowly as an `Entity` of a particular type (e.g., `Assessment`, `Message`, `VideoObject` etc.) that, if acted upon by an `actor` at a particular moment in time is termed an `Event`.  Yet for both Caliper and xAPI, an activity can comprise one of more statements or events.
 
-2. *Statement Result and Caliper Generatables*.  Unlike Caliper, xAPI provides its Statement with a top-level `result` property.  This sort of privileging is understandable given xAPI's SCORM antecedent and roots in corporate training where compliance is a key goal.  Caliper treats it's `Result` as one of a number of "generated" entities that may be produced during an interaction such as grading an assignment.  Other Caliper generated entities such as `Annotation`, `Attempt` and `Response` have no place within the xAPI Statement model outside of `context.extensions`, a property that represents a semantic black hole within the xAPI ecosystem.
+#### Statement Result and Caliper Generatables  
+Unlike Caliper, xAPI provides its Statement with a top-level `result` property.  This sort of privileging is understandable given xAPI's SCORM antecedent and roots in corporate training where compliance is a key goal.  Caliper treats it's `Result` as one of a number of "generated" entities that may be produced during an interaction such as grading an assignment.  Other Caliper generated entities such as `Annotation`, `Attempt` and `Response` have no place within the xAPI Statement model outside of `context.extensions`, a property that represents a semantic black hole within the xAPI ecosystem.
 
-3. *Statement context*
+#### Statement id handling
+There is no firm requirement as is the case with Caliper that a Statement provider MUST set a Statement `id`; it is only a recommendation.  If a Statement is received without an `id` the LRS MUST set it.  If a Statement provider were to emit statement copies sans `id` to multiple endpoints a scenario could arise in which the same Statement could be stamped with different `id` values.
 
-xAPI Statement to Caliper Event mappings
+#### Statement timestamp handling
+Unlike Caliper Event providers, xAPI Statement providers are not required to provide a `timestamp` value indicating when a statement occurred.  If a Statement does not include a `timestamp` value the receiving LRS must set it.  As in the case of Statements sent without an identifier, should a provider send Statement copies without a timestamp to multiple LRS instances, there is a strong likelihood that each copy will receive a different timestamp.
+
+*Statement context*
+
+TODO: summarize
+
+
+### xAPI Statement to Caliper Event mappings
 
 | xAPI | Type | Caliper | Type | Notes |
 | :--- | :--- | :------ | :--- | :---- |
@@ -77,13 +88,7 @@ Other mappings
 
 
 
-4. *Statement id handling*.  There is no firm requirement as is the case with Caliper that a Statement provider MUST set a Statement `id`; it is only a recommendation.  If a Statement is received without an `id` the LRS MUST set it.  If a Statement provider were to emit statement copies sans `id` to multiple endpoints a scenario could arise in which the same Statement could be stamped with different `id` values.
-
-5. *Statement timestamp handling*.  Unlike Caliper Event providers, xAPI Statement providers are not required to provide a `timestamp` value indicating when a statement occurred.  If a Statement does not include a `timestamp` value the receiving LRS must set it.  As in the case of Statements sent without an identifier, should a provider send Statement copies without a timestamp to multiple LRS instances, there is a strong likelihood that each copy will receive a different timestamp.
-
-
-
-## xAPI nuggets
+### xAPI nuggets of goodness
 
 1.  Voiding statements
 https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#232-voiding
