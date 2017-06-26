@@ -96,18 +96,19 @@ TODO: summarize
 ### xAPI Statement to Caliper Event mappings
 
 | xAPI | Type | Conformance | Caliper | Type | Conformance | Notes |
-| :--- | :--- | :------ | :--- | :---- |
+| :--- | :--- | :---------- | :------ | :--- | :---------- | :---- |
 | `id` | UUID | Required | `Event.id` | UUID URN | Required | Remap `Statement.id` as urn:uuid\<UUID\>. |
 | `actor` | Object | Required | `Event.actor` | Agent | Required | &nbsp; |
-| `verb` | Object | `Event.action` | Term | Remap to `Event.action` and/or adjust Caliper to express an action as either an Object, string IRI or string term.  We can alias the JSON-LD @language keyword in order to map the xAPI `display` property. | 
+| `verb` | Object | Required | `Event.action` | Term | Required | Remap to `Event.action` and/or adjust Caliper to express an action as either an Object, string IRI or string term.  We can alias the JSON-LD @language keyword in order to map the xAPI `display` property. | 
 | `result` | Object | Optional | `Event.generated` | `Result` | Optional | &nbsp; |
-| `context` | Object | Optional | &nbsp; | &nbsp; | See individual properties below. |
-| `context.registration` | UUID | Optional | &nbsp; | &nbsp; | &nbsp; |
-| `context.instructor` | Agent or Group | Optional | `Organization.extensions` | `Person` or `Group` | xAPI: instructor that the Statement relates to, if not already included as the Statement `actor`. Caliper: assuming `Event.group` is a `Course` or `CourseSection` map to `Course.extensions` or `CourseSection.extensions`. |
+| `context` | Object | Optional | `Event.extensions.xapi.context` | Object | Optional | Certain `context` properties can be mapped to Caliper properties.  See below. |
+| `context.registration` | UUID | Optional | `Event.extensions.xapi.context.registration` | UUID | Optional | &nbsp; |
+| `context.instructor` | Agent or Group | Optional | `Organization.extensions` | `Person` or `Group` | Optional | xAPI: instructor that the Statement relates to, if not already included as the Statement `actor`. Caliper: assuming `Event.group` is a `Course` or `CourseSection` map to `Course.extensions` or `CourseSection.extensions`. |
 | `context.team` | Group | Optional | `Event.membership.organization` | Membership | Optional | xAPI: "Team that the Statement relates to, if not already included as the Statement `actor`.  Caliper: map to `Event.membership.organization` (although xAPI does not appear to model an individual member's role or status) or `Event.extensions`. |
 | `context.revision` | string | Optional | `Event.object` | `DigitalResource.version` | Optional | xAPI: use only if object is an Activity). Caliper: map to `DigitalResource.version`. |
-| `context.platform` | string | Optional | `edApp` | SoftwareApplication | Optional | Caliper: this mapping is tricky.  Ideally `context.platform` should map to `Event.edApp` but since there is no xAPI requirement that the value be expressed as an identifier we may need to simply map it to `Event.extenstions`. |
-| &nbsp; | &nbsp; | `group` | Organization | &nbsp; |
+| `context.platform` | string | Optional | `Event.extenstions.xapi.platform` | string | Optional | Caliper: this mapping is tricky.  Ideally `context.platform` should map to `Event.edApp` but since there is no xAPI requirement that the value be expressed as an identifier we may need to simply map it to `Event.extenstions.xapi.platform`. |
+| &nbsp; | &nbsp; | &nbsp; | `Event.edApp` | SoftwareOrganization | Optional | &nbsp; |
+| &nbsp; | &nbsp; | &nbsp; | `Event.group` | Organization | Optional | &nbsp; |
 | `context.language` | string | Optional | `Event.extensions` | string | Optional | xAPI: RFC 5646 language code.  Caliper: no equivalent property currently described.  Map to `Event.extensions`. |
 | `context.statement` | Statement Reference Object | Optional | &nbsp; | &nbsp; | Optional | xAPI: another Statement considered as context for this Statement.  Caliper: no equivalent property currently described. |
 | `context.extensions` | Object | `Event.extensions` | Object | xAPI: A map of other domain-specific context relevant to the Statement. Caliper: map to `Event.extensions`. |
@@ -115,7 +116,7 @@ TODO: summarize
 | `stored` | Timestamp | Optional | &nbsp; | &nbsp; | &nbsp; | xAPI: set by LRS so no Caliper mapping is required. |
 | `authority` | Object | Optional | `Event.extensions.xapi.authority` | Object | Optional | Caliper: no equivalent property currently described. |
 | `version` | string | Not recommended | `Event.extensions.xapi.version` | string | Optional | Caliper: Events and Entities are versioned via reference to the JSON-LD @context and the `Envelope.dataVersion` property. | 
-| `attachments` | Array<Object> | Optional | `Event.extensions.xapi.attachments` | Array<Object> | Optional | xAPI: ordered object array of headers for Attachments to the Statement.  Caliper: no equivalent property currently described. |
+| `attachments` | Array\<Object\> | Optional | `Event.extensions.xapi.attachments` | Array\<Object\> | Optional | xAPI: ordered object array of headers for Attachments to the Statement.  Caliper: no equivalent property currently described. |
 
 #### Notes
 `context.revision`. See See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context): The "revision" property MUST only be used if the Statement's Object is an Activity; The "revision" property SHOULD be used to track fixes of minor issues (like a spelling error); The "revision" property SHOULD NOT be used if there is a major change in learning objectives, pedagogy, or assets of an Activity. (Use a new Activity id instead).
