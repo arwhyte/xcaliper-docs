@@ -100,6 +100,7 @@ TODO: summarize
 | `id` | UUID | Required | `Event.id` | UUID URN | Required | Remap `Statement.id` as urn:uuid\<UUID\>. |
 | `actor` | Object | Required | `Event.actor` | Agent | Required | &nbsp; |
 | `verb` | Object | Required | `Event.action` | Term | Required | Remap to `Event.action` and/or adjust Caliper to express an action as either an Object, string IRI or string term.  We can alias the JSON-LD @language keyword in order to map the xAPI `display` property. | 
+| `object` | Object | Optional | `Event.object` | `Entity` | Required | &nbsp; |
 | `result` | Object | Optional | `Event.generated` | `Result` | Optional | &nbsp; |
 | `context` | Object | Optional | `Event.extensions.xapi.context` | Object | Optional | Certain `context` properties can be mapped to Caliper properties.  See below. |
 | `context.registration` | UUID | Optional | `Event.extensions.xapi.context.registration` | UUID | Optional | &nbsp; |
@@ -120,6 +121,8 @@ TODO: summarize
 | `attachments` | Array\<Object\> | Optional | `Event.extensions.xapi.attachments` | Array\<Object\> | Optional | xAPI: ordered object array of headers for Attachments to the Statement. |
 
 #### Notes
+
+`object`.  See xAPI-Spec [2.4.4](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#244-object).
 
 `context.registration`.  "When an LRS is an integral part of an LMS, the LMS likely supports the concept of registration. The Experience API applies the concept of registration more broadly. A registration could be considered to be an attempt, a session, or could span multiple Activities. There is no expectation that completing an Activity ends a registration. Nor is a registration necessarily confined to a single Agent.
 
