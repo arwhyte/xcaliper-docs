@@ -103,33 +103,71 @@ TODO: summarize
 | `result` | Object | Optional | `Event.generated` | `Result` | Optional | &nbsp; |
 | `context` | Object | Optional | `Event.extensions.xapi.context` | Object | Optional | Certain `context` properties can be mapped to Caliper properties.  See below. |
 | `context.registration` | UUID | Optional | `Event.extensions.xapi.context.registration` | UUID | Optional | &nbsp; |
-| `context.instructor` | Agent or Group | Optional | `Organization.extensions` | `Person` or `Group` | Optional | xAPI: instructor that the Statement relates to, if not already included as the Statement `actor`. Caliper: assuming `Event.group` is a `Course` or `CourseSection` map to `Course.extensions` or `CourseSection.extensions`. |
-| `context.team` | Group | Optional | `Event.membership.organization` | Membership | Optional | xAPI: "Team that the Statement relates to, if not already included as the Statement `actor`.  Caliper: map to `Event.membership.organization` (although xAPI does not appear to model an individual member's role or status) or `Event.extensions`. |
-| `context.revision` | string | Optional | `Event.object` | `DigitalResource.version` | Optional | xAPI: use only if object is an Activity). Caliper: map to `DigitalResource.version`. |
-| `context.platform` | string | Optional | `Event.extenstions.xapi.platform` | string | Optional | Caliper: this mapping is tricky.  Ideally `context.platform` should map to `Event.edApp` but since there is no xAPI requirement that the value be expressed as an identifier we may need to simply map it to `Event.extenstions.xapi.platform`. |
+| `context.instructor` | Agent or Group | Optional | `Organization.extensions` | `Person` or `Group` | Optional | Caliper: assuming `Event.group` is a `Course` or `CourseSection` map to `Course.extensions` or `CourseSection.extensions`. |
+| `context.team` | Group | Optional | `Event.membership.organization` | Membership | Optional | Caliper: map to `Event.membership.organization` (although xAPI does not appear to model an individual member's role or status) or `Event.extensions`. |
+| `context.contextActivities` | ContextActivities Object | Optional | `Event.extensions.xapi.context.contextActivities` | `Entity` | Optional | Additionally, if type = "parent" and Statement `object` is an Activity and `Event.object` is a `DigitalResource` then map to `DigitalResource.isPartOf`.  If type=grouping then map to `Event.group` `Organization.subOrganizationOf`.  A link to an xAPI profile can be established by defining a "category" type. |
+| `context.revision` | string | Optional | `Event.object` | `DigitalResource.version` | Optional | xAPI: use only if object is an Activity). Map to `DigitalResource.version` or `extensions.xapi.context.revision`. |
+| `context.platform` | string | Optional | `Event.extenstions.xapi.platform` | string | Optional | Caliper: ideally `context.platform` should map to `Event.edApp` but since there is no xAPI requirement that the value be expressed as an identifier we may need to simply map it to `Event.extenstions`. |
 | &nbsp; | &nbsp; | &nbsp; | `Event.edApp` | SoftwareOrganization | Optional | &nbsp; |
 | &nbsp; | &nbsp; | &nbsp; | `Event.group` | Organization | Optional | &nbsp; |
-| `context.language` | string | Optional | `Event.extensions` | string | Optional | xAPI: RFC 5646 language code.  Caliper: no equivalent property currently described.  Map to `Event.extensions`. |
-| `context.statement` | Statement Reference Object | Optional | &nbsp; | &nbsp; | Optional | xAPI: another Statement considered as context for this Statement.  Caliper: no equivalent property currently described. |
+| `context.language` | string | Optional | `Event.extensions.xapi.language` | string | Optional | xAPI: RFC 5646 language code. |
+| `context.statement` | Statement Reference Object | Optional | `Event.extensions.xapi.statement | Object | Optional | xAPI: another Statement considered as context for this Statement. |
 | `context.extensions` | Object | `Event.extensions` | Object | xAPI: A map of other domain-specific context relevant to the Statement. Caliper: map to `Event.extensions`. |
-| `timestamp` | Timestamp | Optional | `Event.eventTime` | DateTime | Required | Caliper: map to `Event.eventTime` if `timestamp` is provided by Statement provider or set it (add an extension property that indicates that the consumer set the `eventTime`. |
-| `stored` | Timestamp | Optional | &nbsp; | &nbsp; | &nbsp; | xAPI: set by LRS so no Caliper mapping is required. |
+| `timestamp` | DateTime | Optional | `Event.eventTime` | DateTime | Required | Caliper: map to `Event.eventTime` if `timestamp` is provided by Statement provider or set it (add an extension property that indicates that the consumer set the `eventTime`. |
+| `stored` | DateTime | Optional | &nbsp; | &nbsp; | &nbsp; | xAPI: set by LRS so no Caliper mapping is required. |
 | `authority` | Object | Optional | `Event.extensions.xapi.authority` | Object | Optional | Caliper: no equivalent property currently described. |
 | `version` | string | Not recommended | `Event.extensions.xapi.version` | string | Optional | Caliper: Events and Entities are versioned via reference to the JSON-LD @context and the `Envelope.dataVersion` property. | 
-| `attachments` | Array\<Object\> | Optional | `Event.extensions.xapi.attachments` | Array\<Object\> | Optional | xAPI: ordered object array of headers for Attachments to the Statement.  Caliper: no equivalent property currently described. |
+| `attachments` | Array\<Object\> | Optional | `Event.extensions.xapi.attachments` | Array\<Object\> | Optional | xAPI: ordered object array of headers for Attachments to the Statement. |
 
 #### Notes
-`context.revision`. See See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context): The "revision" property MUST only be used if the Statement's Object is an Activity; The "revision" property SHOULD be used to track fixes of minor issues (like a spelling error); The "revision" property SHOULD NOT be used if there is a major change in learning objectives, pedagogy, or assets of an Activity. (Use a new Activity id instead).
+
+`context.registration`.  "When an LRS is an integral part of an LMS, the LMS likely supports the concept of registration. The Experience API applies the concept of registration more broadly. A registration could be considered to be an attempt, a session, or could span multiple Activities. There is no expectation that completing an Activity ends a registration. Nor is a registration necessarily confined to a single Agent.
+
+The Registration is also used when storing documents within the State Resource, e.g. for bookmarking. Normally the same registration is used for requests to both the Statement and State Resources relating to the same learning experience so that all data recorded for the experience is consistent."  See xAPI-Spec [2.4.6.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2461-registration-property).
+
+`context.instructor`.  Instructor associated with the Statement if not already defined as the Statement `actor`. See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context).
+
+`context.team`.  Team associated with the Statement if not already defined as the Statement `actor`.  See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context).
+
+`context.contextActivities`.  A map of learning activity context types associated with the Statement.  
+
+> There are four valid context types. All, any or none of these MAY be used in a given Statement:
+>
+> Parent: an Activity with a direct relation to the Activity which is the Object of the Statement. In almost all cases there is only one sensible parent or none, not multiple. For example: a Statement about a quiz question would have the quiz as its parent Activity.
+>
+> Grouping: an Activity with an indirect relation to the Activity which is the Object of the Statement. For example: a course that is part of a qualification. The course has several classes. The course relates to a class as the parent, the qualification relates to the class as the grouping.
+>
+> Category: an Activity used to categorize the Statement. "Tags" would be a synonym. Category SHOULD be used to indicate a profile of xAPI behaviors, as well as other categorizations. For example: Anna attempts a biology exam, and the Statement is tracked using the cmi5 profile. The Statement's Activity refers to the exam, and the category is the cmi5 profile.
+>
+> Other: a contextActivity that doesn't fit one of the other properties. For example: Anna studies a textbook for a biology exam. The Statement's Activity refers to the textbook, and the exam is a contextActivity of type other."
+
+See xAPI-Spec [2.4.6.2](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2462-contextactivities-property).
+
+`context.revision`. The "revision" property MUST only be used if the Statement's Object is an Activity; The "revision" property SHOULD be used to track fixes of minor issues (like a spelling error); The "revision" property SHOULD NOT be used if there is a major change in learning objectives, pedagogy, or assets of an Activity. (Use a new Activity id instead).  See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context).
 
 `context.platform`. See xAPI-Spec [Appendix A](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#appendix-a-example-statements) or a JISC [example](https://github.com/jiscdev/xapi/blob/master/recipes/assignment-submitted.md). 
 
 `context.language`.  RFC 5646 code "representing the language in which the experience being recorded in this Statement (mainly) occurred in, if applicable and known."  See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context).
 
-`context.registration`.  See xAPI-Spec [2.4.6.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2461-registration-property)
+`context.statement`.  Another Statement to be considered as context for this Statement.  See xAPI-Spec [Statement References](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#statement-references).
 
-"When an LRS is an integral part of an LMS, the LMS likely supports the concept of registration. The Experience API applies the concept of registration more broadly. A registration could be considered to be an attempt, a session, or could span multiple Activities. There is no expectation that completing an Activity ends a registration. Nor is a registration necessarily confined to a single Agent.
+```
+{
+  . . .
+  "extensions": {
+    "xapi": {
+      "context": {
+        "statement": {
+          "id": "8f87ccde-bb56-4c2e-ab83-44982ef22df0",
+          "objectType": "StatementRef"
+        }
+      }
+    }
+  }
+}
+```
 
-The Registration is also used when storing documents within the State Resource, e.g. for bookmarking. Normally the same registration is used for requests to both the Statement and State Resources relating to the same learning experience so that all data recorded for the experience is consistent."
+
 
 
 
