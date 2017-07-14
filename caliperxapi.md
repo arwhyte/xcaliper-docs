@@ -38,13 +38,35 @@ What is labeled and described in more detail throughout this proposed, is "xCali
 
 ### xAPI challenges
 
+#### Remapping xAPI verbs to Caliper actions
+
+The absence of firm xAPI governance and curation practices means that anyone can mint a verb for use in an xAPI statement.  That said, Rustici has made an attempt to provide the xAPI community with a registry of xAPI verbs.  Most of the "Tincan" verbs are drawn from the W3C Activity Streams 1.0 specification, a verb set much reduced in size in the re-scoped Activity Streams 2.0 release.  ADL's set of xAPI verbs are also included.  Rustici has itself contributed a robust set of verbs to the registry.  A small set of additional verbs are drawn from a variety of commercial organizations or individuals including Brindleway, HT2 Labs (Curatr), RISC and Andrew Downes among others.  Not all verbs in the Rustici registry focus on learning (e.g., "laughed", "purchased", "ran", "walked"). 
+
+| &nbsp; | Caliper | ADL xAPI | Rustici xAPI | Activity Streams 2.0 | Activity Streams 1.0 | Others |
+| :----- | :-------| :------- | :----------- | :------------------- | :------------------- | ----- |
+| Total  | 64 | 30 | 46 | 28 | 88 | 19 |
+
+Term duplication across the various verb vocabularies exists which the xCaliper service can leverage to map xAPI verbs to Caliper actions as in the following example:
+
+```
+https://w3id.org/xapi/adl/verbs/logged-in  -->  http://purl.imsglobal.org/caliper/actions/LoggedIn
+```
+  
+However, it would be wrong to overplay our current ability to remap large numbers of xAPI verbs to Caliper actions.  We possess no statistics on xAPI Statement verb usage.  Likely, a good number of verbs described in the Rustici Tincan verb registry will never be encountered.  Nevertheless, we anticipate that the xCaliper service will need to process many xAPI verb object representations that have no ready equivalents in Caliper.  In such cases, xAPI verb IRIs will be need to be assigned as values to ```Event.action```.
+
+One example should suffice.  The ADL vocabulary is comprised of 30 verbs.  As of today, we can remap 13 (43.33%) of the ADL verbs to Caliper actions.  Of the 13 verbs we can achieve an exact match on 8 (26.66%) and a near match on 5 (16.66%), such as swapping in "modified" for "updated."  This is not a robust number.
+
+Over time the number of Caliper described actions will increase as existing profiles are revised and new profiles are added to the model.  For instance, the draft Caliper Digital Badges profiles adds a dozen new actions.  As the action footprint grows our ability to map xAPI verbs to Caliper actions will be increase.
+
+Mapping xAPI verbs to Caliper actions will require the establishment and maintenance of data dictionaries.  Defining and publishing equivalencies between verbs and actions as well as Entities and xAPI activity types should be included in the scope of the proposed IMS "Profiles Registry".  Indeed, we should propose to Rustici that they consider retiring their commercial-backed registry in favor of an IMS-sponsored registry.
+
 #### Discerning types
 
 Statement and object typing is limited and map poorly to Caliper.  Unlike Caliper, which distinguishes between `Event` types for descriptive purposes and as an aid to querying (e.g., `AssessmentEvent`, `MessageEvent` etc.), xAPI Statement "types" can be defined optionally by specifying a `context.contextActivities` object typed with an array of one or more "category" object values.  Each category is defined as "an Activity used to categorize the Statement" which in practice is used to link a Statement to a profile such as cmi5 in order to facilitate Statement search and retrieval (see cmi5 9.6.2 [contextActivities](https://github.com/AICC/CMI-5_Spec_Current/blob/quartz/cmi5_spec.md#context_activities).  
 
 Statement "types" can also be inferred from the `object.objectType` property.  Available `objectType` values are limited to "Activity", "Agent", "Group", "SubStatement" and "StatementRef".  If an xAPI `object` is typed as an `Activity` it may include an optional activity `definition` object property that provides additional metadata regarding the activity including a `type` IRI.  This approach results in an unnecessarily awkward if not overly complex JSON representation of an xAPI `object` when compared to a matching Caliper representation, which is decidely more compact and does not require resorting to its optional `extensions` property to reference basic information like a due date:  
 
-JISC xAPI Assignment submitted [receipe](https://github.com/jiscdev/xapi/blob/master/recipes/assignment-submitted.md) `object`
+JISC xAPI Assignment submitted [recipe](https://github.com/jiscdev/xapi/blob/master/recipes/assignment-submitted.md) `object`
 
 ```
 "object": {
@@ -95,28 +117,254 @@ TODO: summarize
 
 ### xAPI Statement to Caliper Event mappings
 
-| xAPI | Type | Caliper | Type | Notes |
-| :--- | :--- | :------ | :--- | :---- |
-| `id` | UUID | `id` | UUID as a URN | Remap `Statement.id` as urn:uuid\<UUID\>. |
-| `actor` | Agent \| Group | `actor` | Agent | &nbsp; |
-| `verb` | Object | `action` | Term | Remap to `Event.action` and/or adjust Caliper to express an action as either an Object, string IRI or string term.  We can alias the JSON-LD @language keyword in order to map the xAPI `display` property. | 
-| `result` | Object | &nbsp; | &nbsp; | Remap to `Event.generated`. |
-| `context.group` | Group | `membership` | Membership | xAPI: "Team that the Statement relates to, if not included as the Actor of the Statement."  This relationship should be mappable to `Event.membership` although xAPI does not appear to model an individual member's role or status. |
-| `context.language` | String per RFC 5646 | &nbsp; | &nbsp; | No equivalent in Caliper. |
-| `context.platform` | String | `edApp` | SoftwareApplication | Even if we coerce the edApp to its IRI the mapping remains weak as there is no xAPI requirement that the value be expressed as an identifier.  See xAPI-Spec [Appendix A](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#appendix-a-example-statements) or a JISC [example](https://github.com/jiscdev/xapi/blob/master/recipes/assignment-submitted.md). |
-| &nbsp; | &nbsp; | `group` | Organization | &nbsp; |
-| `context.statement` | Statement Reference Object | &nbsp; | &nbsp; | Another Statement considered as context for this Statement.  No equivalent currently in Caliper. |
-| `timestamp` | DateTime | `eventTime` | DateTime | Remap if optional `timestamp` is provided by provider or set it (add an extension property that indicates that the consumer set the `eventTime`. |
-| `stored` | DateTime | &nbsp; | &nbsp; | xAPI: set by LRS.  No equivalent currently in Caliper. |
-| `authority` | Object | &nbsp; | &nbsp; | xAPI: optional.  No equivalent currently in Caliper. |
-| `version` | String | &nbsp; | &nbsp; | xAPI: not recommended.  Caliper Events are versioned via reference to the JSON-LD @context and the `Envelope.dataVersion` property. | 
-| `attachments` | Ordered array of Attachment Objects | &nbsp; | &nbsp; | xAPI: optional.  Headers for Attachments to the Statement.  No equivalent currently in Caliper. |
+| xAPI | Type | Conformance | Caliper | Type | Conformance | Notes |
+| :--- | :--- | :---------- | :------ | :--- | :---------- | :---- |
+| `id` | UUID | Required | `Event.id` | UUID URN | Required | Remap `Statement.id` as urn:uuid\<UUID\>. |
+| `actor` | Object | Required | `Event.actor` | Agent | Required | &nbsp; |
+| `verb` | Object | Required | `Event.action` | Term | Required | Remap to `Event.action` and/or adjust Caliper to express an action as either an Object, string IRI or string term.  We can alias the JSON-LD @language keyword in order to map the xAPI `display` property. | 
+| `object` | Object | Optional | `Event.object` | `Entity` | Required | &nbsp; |
+| `result` | Object | Optional | `Event.generated` | `Result` | Optional | &nbsp; |
+| `context` | Object | Optional | `Event.extensions.xapi.context` | Object | Optional | Certain `context` properties can be mapped to Caliper properties.  See below. |
+| `context.registration` | UUID | Optional | `Event.extensions.xapi.context.registration` | UUID | Optional | &nbsp; |
+| `context.instructor` | Agent or Group | Optional | `Organization.extensions` | `Person` or `Group` | Optional | Caliper: assuming `Event.group` is a `Course` or `CourseSection` map to `Course.extensions` or `CourseSection.extensions`. |
+| `context.team` | Group | Optional | `Event.membership.organization` | Membership | Optional | Caliper: map to `Event.membership.organization` (although xAPI does not appear to model an individual member's role or status) or `Event.extensions`. |
+| `context.contextActivities` | ContextActivities Object | Optional | `Event.extensions.xapi.context.contextActivities` | `Entity` | Optional | Additionally, if type = "parent" and Statement `object` is an Activity and `Event.object` is a `DigitalResource` then map to `DigitalResource.isPartOf`.  If type=grouping then map to `Event.group` `Organization.subOrganizationOf`.  A link to an xAPI profile can be established by defining a "category" type. |
+| `context.revision` | string | Optional | `Event.object` | `DigitalResource.version` | Optional | xAPI: use only if object is an Activity). Map to `DigitalResource.version` or `extensions.xapi.context.revision`. |
+| `context.platform` | string | Optional | `Event.extensions.xapi.platform` | string | Optional | Caliper: ideally `context.platform` should map to `Event.edApp` but since there is no xAPI requirement that the value be expressed as an identifier we may need to simply map it to `Event.extenstions`. |
+| &nbsp; | &nbsp; | &nbsp; | `Event.edApp` | SoftwareOrganization | Optional | &nbsp; |
+| &nbsp; | &nbsp; | &nbsp; | `Event.group` | Organization | Optional | &nbsp; |
+| `context.language` | string | Optional | `Event.extensions.xapi.language` | string | Optional | xAPI: RFC 5646 language code. |
+| `context.statement` | Statement Reference Object | Optional | `Event.extensions.xapi.statement` | Object | Optional | xAPI: another Statement considered as context for this Statement. |
+| `context.extensions` | Object | `Event.extensions` | Object | xAPI: A map of other domain-specific context relevant to the Statement. Caliper: map to `Event.extensions`. |
+| `timestamp` | DateTime | Optional | `Event.eventTime` | DateTime | Required | Caliper: map to `Event.eventTime` if `timestamp` is provided by Statement provider or set it (add an extension property that indicates that the consumer set the `eventTime`. |
+| `stored` | DateTime | Optional | &nbsp; | &nbsp; | &nbsp; | xAPI: set by LRS so no Caliper mapping is required. |
+| `authority` | Object | Optional | `Event.extensions.xapi.authority` | Object | Optional | Caliper: no equivalent property currently described. |
+| `version` | string | Not recommended | `Event.extensions.xapi.version` | string | Optional | Caliper: Events and Entities are versioned via reference to the JSON-LD @context and the `Envelope.dataVersion` property. | 
+| `attachments` | Array\<Object\> | Optional | `Event.extensions.xapi.attachments` | Array\<Object\> | Optional | xAPI: ordered object array of headers for Attachments to the Statement. |
+
+#### Notes
+
+`object`.  See xAPI-Spec [2.4.4](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#244-object).
+
+`context.registration`.  "When an LRS is an integral part of an LMS, the LMS likely supports the concept of registration. The Experience API applies the concept of registration more broadly. A registration could be considered to be an attempt, a session, or could span multiple Activities. There is no expectation that completing an Activity ends a registration. Nor is a registration necessarily confined to a single Agent.
+
+The Registration is also used when storing documents within the State Resource, e.g. for bookmarking. Normally the same registration is used for requests to both the Statement and State Resources relating to the same learning experience so that all data recorded for the experience is consistent."  See xAPI-Spec [2.4.6.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2461-registration-property).
+
+`context.instructor`.  Instructor associated with the Statement if not already defined as the Statement `actor`. See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context).
+
+`context.team`.  Team associated with the Statement if not already defined as the Statement `actor`.  See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context).
+
+`context.contextActivities`.  A map of learning activity context types associated with the Statement.  
+
+> There are four valid context types. All, any or none of these MAY be used in a given Statement:
+>
+> Parent: an Activity with a direct relation to the Activity which is the Object of the Statement. In almost all cases there is only one sensible parent or none, not multiple. For example: a Statement about a quiz question would have the quiz as its parent Activity.
+>
+> Grouping: an Activity with an indirect relation to the Activity which is the Object of the Statement. For example: a course that is part of a qualification. The course has several classes. The course relates to a class as the parent, the qualification relates to the class as the grouping.
+>
+> Category: an Activity used to categorize the Statement. "Tags" would be a synonym. Category SHOULD be used to indicate a profile of xAPI behaviors, as well as other categorizations. For example: Anna attempts a biology exam, and the Statement is tracked using the cmi5 profile. The Statement's Activity refers to the exam, and the category is the cmi5 profile.
+>
+> Other: a contextActivity that doesn't fit one of the other properties. For example: Anna studies a textbook for a biology exam. The Statement's Activity refers to the textbook, and the exam is a contextActivity of type other."
+
+See xAPI-Spec [2.4.6.2](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2462-contextactivities-property).
+
+`context.revision`. The "revision" property MUST only be used if the Statement's Object is an Activity; The "revision" property SHOULD be used to track fixes of minor issues (like a spelling error); The "revision" property SHOULD NOT be used if there is a major change in learning objectives, pedagogy, or assets of an Activity. (Use a new Activity id instead).  See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context).
+
+`context.platform`. See xAPI-Spec [Appendix A](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#appendix-a-example-statements) or a JISC [example](https://github.com/jiscdev/xapi/blob/master/recipes/assignment-submitted.md). 
+
+`context.language`.  RFC 5646 code "representing the language in which the experience being recorded in this Statement (mainly) occurred in, if applicable and known."  See xAPI-Spec [2.4.6](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#246-context).
+
+`context.statement`.  Another Statement to be considered as context for this Statement.  See xAPI-Spec [Statement References](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#statement-references).
+
+```
+{
+  . . .
+  "extensions": {
+    "xapi": {
+      "context": {
+        "statement": {
+          "id": "8f87ccde-bb56-4c2e-ab83-44982ef22df0",
+          "objectType": "StatementRef"
+        }
+      }
+    }
+  }
+}
+```
+
+
+### Object to Entity mappings
+
+| xAPI | Type | Conformance | Caliper | Type | Conformance | Notes |
+| :--- | :--- | :---------- | :------ | :--- | :---------- | :---- |
+| `id` | UUID | Required | `Entity.id` | IRI | Required | Remap Activity identifier as urn:uuid\<UUID\>. |
+| `objectType` | string | Optional | `Entity.extensions.xapi.objectType` | string | Optional | xAPI: if defined value MUST = "Activity". |
+| `definition` | Object | Optional | &nbsp; | &nbsp; | &nbsp; | Caliper: map attributes to various `Entity` properties. |
+| `definition.type` | IRI | Recommended | `Entity.type` | Required | If a mapping exists between the type and a Caliper `Entity` type use the Caliper type; otherwise use generic `Entity` type and add `Entity.extensions.xapi.definition.type`. |
+| `definition.name` | Language Map | Recommended | `Entity.name` | string | Optional | Caliper: either ignore the language map or store the key (e.g., "en-US") as `Entity.extensions.xapi.definition.name.key.languageTag`. |
+| `definition.description` | Language Map | Recommended | `Entity.description` | string | Optional | Caliper: either ignore the language map or store the key (e.g., "en-US") as `Entity.extensions.xapi.definition.description.key.languageTag`. |
+| `definition.moreInfo` | IRL | Optional | `Entity.extensions.xapi.definition.moreInfo` | 
+| `definition.extensions` | Object | Optional | `Entity.extensions` | Object | Optional | &nbsp; |
+
+
+#### Notes
+
+`definition.moreInfo`: "Resolves to a document with human-readable information about the Activity, which could include a way to launch the activity."
+
+
+#### Interaction activities
+
+xAPI includes built-in definitions for interactions or assessment items based in part on the 
+SCORM 2004 4th Edition Data Model. "Since 1.0.3, direct references to the SCORM data model have started to be removed, and any associated requirements included directly in this document. . . .  These interaction definitions are simple to use, and consequently limited. It is expected that Communities of Practice requiring richer interactions definitions will do so through the use of Activity types and Activity Definition Extensions."  See xAPI-Spec [Interaction Activities](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#interaction-activities).
+
+Caliper 1.1 does not model individual question types only response types.  However, the following approach could be taken to map xAPI interaction activities to a Caliper `AssessmentItem`.    
+
+Proposed mapping rule
+
+If the xAPI Statement `object` `definition.type` property equals "http://adlnet.gov/expapi/activities/cmi.interaction" then set the Entity type to "AssessmentItem", copy `definition.description.en-US` to `AssessmentItem.description` (given that the langauge map key can vary this may prove tricky), then copy the xAPI `object` `definition to `AssessmentItem.extensions`.
+
+```
+{
+  "id": "https://example.edu/terms/201601/courses/7/sections/1/assess/1/items/3",
+  "type": "AssessmentItem",
+  "description": "Which of these prototypes are available at the beta site?",
+  "extensions": {
+    "xapi": {
+      "definition": {
+        "description": {
+          "en-US": "Which of these prototypes are available at the beta site?"
+        },
+        "type": "http://adlnet.gov/expapi/activities/cmi.interaction",
+        "interactionType": "choice",
+        "correctResponsesPattern": [
+          "golf[,]tetris"
+        ],
+        "choices": [{
+            "id": "golf",
+            "description": {
+              "en-US": "Golf Example"
+            }
+          },
+          {
+            "id": "facebook",
+            "description": {
+              "en-US": "Facebook App"
+            }
+          },
+          {
+            "id": "tetris",
+            "description": {
+              "en-US": "Tetris Example"
+            }
+          },
+          {
+            "id": "scrabble",
+            "description": {
+              "en-US": "Scrabble Example"
+            }
+          }
+        ]
+      }
+    }
+  }
+}
+```
+
+See xAPI-Spec [Appendix C](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#appendix-c-example-definitions-for-activities-of-type-cmiinteraction) for additional `cmi.interaction` type examples.
+
+
+
+
+
+
+
+
+`definition` interaction activities.
+
+> Traditional e-learning has included structures for interactions or assessments. As a way to allow these practices and structures to extend Experience API's utility, this specification includes built-in definitions for interactions, which borrows from the SCORM 2004 4th Edition Data Model. These definitions are intended to provide a simple and familiar utility for recording interaction data. Since 1.0.3, direct references to the SCORM data model have started to be removed, and any associated requirements included directly in this document.
+
+
+
+  See xAPI-Spec [interaction Activities](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#interaction-activities)
+
+
+
+
+
 
 Other mappings
+
+
+
+
+
+
+
+
+
+
 
 | Caliper | Type | xAPI | Type | Notes |
 | :------ | :----| :--- | :--- | :---- | 
 | DigitalResource.isPartOf | Entity | context.contextActivities | contextActivities | Maps roughly to contextActivity typed as "Parent" |
+
+
+#### JISC Statement
+{
+  "version": "1.0.0",
+  "id": "c3e2b586-8923-412c-8259-5210ceb79a2f",
+  "timestamp": "2015-12-11T10:19:49.000Z",
+  "actor": {
+    "objectType": "Agent",
+    "name": "test1 test1",
+    "account": {
+      "homePage": "https://jisc.blackboard.com",
+      "name": "test1"
+    }
+  },
+  "verb": {
+    "id": "https://brindlewaye.com/xAPITerms/verbs/loggedin",
+    "display": {
+      "en": "logged in to"
+    }
+  },
+  "object": {
+    "objectType": "Activity",
+    "id": "https://jisc.blackboard.com/webapps/login/",
+    "definition": {
+      "type": "http://activitystrea.ms/schema/1.0/application",
+      "name": {
+        "en": "Blackboard (https://jisc.blackboard.com)"
+      },
+      "description": {
+        "en": "Blackboard (https://jisc.blackboard.com)"
+      },
+      "extensions": {
+        "http://xapi.jisc.ac.uk/applicationType": "http://id.tincanapi.com/activitytype/lms"
+      }
+    }
+  },
+  "context": {
+    "platform": "Blackboard",
+    "extensions": {
+      "http://xapi.jisc.ac.uk/plugin/info": {
+        "https://jisc.blackboard.com": "9.1.201410",
+        "https://jisc.blackboard.com/webapps/bbc-xAPI-BBLEARN/": "1.0.0"
+      },
+      "http://xapi.jisc.ac.uk/sessionId": "32456891",
+      "http://xapi.jisc.ac.uk/recipeVersion": "1.0",
+      "http://id.tincanapi.com/extension/ip-address": "10.3.3.48"
+    }
+  }
+}
+
+
+
+  
+
+
+
+
 
 
 
@@ -137,3 +385,5 @@ https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#interaction-activit
 6.  StatementRef / `context.statement`
 
 7.  [Signed statements](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#26-signed-statements).  Statements can include a digital signature in the form of a JSON web signature (JWS) as an attachment.
+
+9. `context.instructor`.  Consider adding an instructors [] array to `Course` and `CourseSection`. 
