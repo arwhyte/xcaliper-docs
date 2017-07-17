@@ -203,7 +203,7 @@ Where equivalencies exist between the various verb vocabularies xCaliper can sim
 }
 ```
 
-However, there are many xAPI verb object representations that have no ready equivalent in Caliper.  Consider ADL's list of 30 xAPI verbs.  As of today, we can map 13 ADL verbs (43.33%) to Caliper actions.  Of the 13 verbs we can achieve an exact match on 8 (26.66%) and a near match on 5 (16.66%), such as converting ADL's "updated" to Caliper's "modified".  In such cases, xAPI verb IRIs will be need to be assigned as values: 
+As the Caliper information model evolves the number of defined actions will increase, enhancing xCaliper's ability to substitute Caliper actions for xAPI verbs.  For instance, the draft Caliper Digital Badges profile slated for Caliper 1.2 adds a dozen new actions.  However, there are many xAPI verb object representations that have no ready equivalent in Caliper.  Consider ADL's list of 30 xAPI verbs.  As of today, we can map 13 ADL verbs (43.33%) to Caliper actions.  Of the 13 verbs we can achieve an exact match on 8 (26.66%) and a near match on 5 (16.66%), such as converting ADL's "updated" to Caliper's "modified".  In such cases, xAPI verb IRIs will be need to be assigned as values: 
 
 ```
 {
@@ -220,9 +220,7 @@ However, there are many xAPI verb object representations that have no ready equi
 {
   "action": "http://adlnet.gov/expapi/verbs/attended"
 }
-```
-
-As the Caliper information model evolves the number of defined actions will increase, enhancing xCaliper's ability to substitute Caliper actions for xAPI verbs.  For instance, the draft Caliper Digital Badges profile adds a dozen new actions.  
+```  
 
 #### Statement `object` processing
 Likewise, various xAPI vocabularies define Activity types for use when the object of a Statement is an "Activity" rather than an `Agent`, `Group`, `Substatement` or `Statement Reference`.  Despite the confusing nomenclature an xAPI `Activity` is equivalent to a Caliper `Entity`.  Each xAPI Activity type is provisioned with a required `id` (type = IRI) and optional `objectType` (type = string of value "Activity") and `definition` object.  The `definition` or "Activity Definition Object" provides additional recommended and optional metadata about the Activity (see xAPI spec [2.4.4.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2441-when-the-objecttype-is-activity)).
