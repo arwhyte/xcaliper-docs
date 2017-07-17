@@ -394,6 +394,7 @@ Unlike Caliper, xAPI provides its Statement with a top-level `result` property. 
 
 to
 
+```
 {
   "generated": {
     "@context": {
@@ -415,6 +416,7 @@ to
     }
   }
 }
+```
 
 #### Statement `context` processing
 
