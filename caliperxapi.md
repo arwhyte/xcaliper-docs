@@ -38,7 +38,9 @@ What is labeled and described in more detail throughout this proposed, is "xCali
 
 ### xCaliper service behavior
 
-xCaliper will provide a conversion service designed to transform xAPI statements into Caliper events.  Converted Statements will be expressed as JSON-LD.  Caliper terms will supercede xAPI terms whenever exact match and near match mappings exist.  In certain cases, xAPI Activity types and verbs will be retained in order to preserve Statement semantics across the conversion.  This may result in statement-to-event conversions that extend existing Caliper controlled vocabularies.      
+xCaliper will provide a conversion service designed to transform xAPI statements into Caliper events.  Converted Statements will be expressed as JSON-LD.  Caliper terms will supercede xAPI terms whenever exact match and near match mappings exist.  In certain cases, xAPI Activity types and verbs will be retained in order to preserve Statement semantics across the conversion.  This may result in statement-to-event conversions that extend existing Caliper controlled vocabularies.
+
+Mapping xAPI vocabularies to Caliper terms will require the establishment and maintenance of data dictionaries or mapping files.  Defining and publishing equivalencies between terms (perhaps using the SKOS vocabulary [mapping properties](https://www.w3.org/TR/skos-reference/#mapping)) should be included in the scope of the proposed IMS "Profiles Registry".  Indeed, we recommend that IMS propose to Rustici that they consider retiring their commercial-backed registry in favor of an IMS-sponsored replacement.      
  
 #### Message Header processing
 xCaliper will process both PUT (single statement) and POST (single statement, batch statements) HTTP requests.  Message headers will be inspected, in particular `Content-Type` and the custom `X-Experience-API-Version` request headers.  xAPI message requests normally set the `Content-Type` value to "application/json".  Statement requests that include Attachments use the "multipart/mixed" content type.
@@ -220,7 +222,7 @@ However, there are many xAPI verb object representations that have no ready equi
 }
 ```
 
-As the Caliper information model evolves the number of defined actions will increase.  For instance, the draft Caliper Digital Badges profiles adds a dozen new actions.  Mapping xAPI verbs to Caliper actions will require the establishment and maintenance of data dictionaries or term mappings.  Defining and publishing equivalencies between verbs and actions (using the SKOS vocabulary [mapping properties](https://www.w3.org/TR/skos-reference/#mapping)) as well as Entities and xAPI activity types should be included in the scope of the proposed IMS "Profiles Registry".  Indeed, we recommend that IMS propose to Rustici that they consider retiring their commercial-backed registry in favor of an IMS-sponsored replacement.
+As the Caliper information model evolves the number of defined actions will increase, enhancing xCaliper's ability to substitute Caliper actions for xAPI verbs.  For instance, the draft Caliper Digital Badges profile adds a dozen new actions.  
 
 #### Statement `object` processing
 Likewise, various xAPI vocabularies define Activity types for use when the object of a Statement is an "Activity" rather than an `Agent`, `Group`, `Substatement` or `Statement Reference`.  Despite the confusing nomenclature an xAPI `Activity` is equivalent to a Caliper `Entity`.  Each xAPI Activity type is provisioned with a required `id` (type = IRI) and optional `objectType` (type = string of value "Activity") and `definition` object.  The `definition` or "Activity Definition Object" provides additional recommended and optional metadata about the Activity (see xAPI spec [2.4.4.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2441-when-the-objecttype-is-activity)).
