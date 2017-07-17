@@ -223,7 +223,7 @@ As the Caliper information model evolves the number of defined actions will incr
 ```  
 
 #### Statement `object` processing
-Likewise, various xAPI vocabularies define Activity types for use when the object of a Statement is an "Activity" rather than an `Agent`, `Group`, `Substatement` or `Statement Reference`.  Despite the confusing nomenclature an xAPI `Activity` is equivalent to a Caliper `Entity`.  Each xAPI Activity type is provisioned with a required `id` (type = IRI) and optional `objectType` (type = string of value "Activity") and `definition` object.  The `definition` or "Activity Definition Object" provides additional recommended and optional metadata about the Activity (see xAPI spec [2.4.4.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2441-when-the-objecttype-is-activity)).
+Likewise, various xAPI vocabularies define Activity types for use when the object of a Statement is an "Activity" rather than an `Agent`, `Group`, `Substatement` or `Statement Reference`.  Despite the confusing nomenclature an xAPI `Activity` is equivalent to a Caliper `Entity`.  Each xAPI Activity type is provisioned with a required `id` of type IRI and optional `objectType` (type = string of value "Activity") and `definition` object.  The `definition` or "Activity Definition Object" provides additional recommended and optional metadata about the Activity (see xAPI spec [2.4.4.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2441-when-the-objecttype-is-activity)).
 
 The Rustici TinCan registry defines 110 Activity Types drawn principally from Rustici, W3C Activity Streams 1.0, and ADL.  A small set of additional verbs are drawn from a variety of commercial providers including Brindleway, HT2 Labs (Curatr), RISC and Andrew Downes among others.  In addition, W3C Activity Streams 2.0 defines 8 Core types, 5 Actor types, 12 Object types, and 1 Link Type.
 
@@ -252,9 +252,9 @@ As of Caliper 1.1 we can map a minimum 48 xAPI Activity Types (43.63%) listed in
 | AssessmentItem | question | &nbsp; |
 | Entity | simulation |  &nbsp; |
 
-xAPI Activity Types will be mapped as follows:
+xCaliper will process Activity Types as follows:
 
-If `object.objectType` = "Activity", map the xAPI Statement `object` to a Caliper `Entity`.  If possible, convert the xAPI Activity type to an `Entity` subtype if a known equivalency exists.  xCaliper would attempt to convert Activity `definition` object properties to Caliper `Entity` properties (e.g., `name` to `name`). xAPI properties that could not be mapped to an existing Caliper property would be added to `Entity.extentions`.
+If the `object.objectType` = "Activity", map the xAPI Statement `object` to a Caliper `Entity`.  If possible, convert the xAPI Activity type to an `Entity` subtype if a known equivalency exists.  xCaliper would attempt to convert Activity `definition` object properties to Caliper `Entity` properties (e.g., `name` to `name`). xAPI properties that could not be mapped to an existing Caliper property would be added to `Entity.extentions`.
 
 ```		  
 {
@@ -331,7 +331,7 @@ to
 }
 ```
 
-converted to
+to
 
 ```
 {
@@ -352,9 +352,9 @@ converted to
 }
 ```
 
-If `object.objectType` = "Agent" or "Group", xCaliper would map the xAPI Statement `object` to a Caliper `Person`, `Group` as described above. 
+If the `object.objectType` = "Agent" or "Group", xCaliper would map the xAPI Statement `object` to a Caliper `Person`, `Group` as described above. 
 
-If `object.objectType` = "StatementRef" xCaliper can either map the xAPI Statement `object` to a generic Caliper `Event` or retain the xAPI type and provide an inline @context based on Jason Haag's draft [xAPI ontology](https://github.com/arwhyte/xapi-ontology/blob/master/ontology.rdf).  Note that an xAPI StatementRef object is provisioned with only an `id` and `type`.  If xCaliper were to convert a StatementRef to a generic Caliper `Event` certain required properties (i.e., `actor`, `action`, `object`, `endTime`) could not be set--a violation of the current model.
+If the `object.objectType` = "StatementRef" xCaliper can either map the xAPI Statement `object` to a generic Caliper `Event` or retain the xAPI type and provide an inline @context based on Jason Haag's draft [xAPI ontology](https://github.com/arwhyte/xapi-ontology/blob/master/ontology.rdf).  Note that an xAPI StatementRef object is provisioned with only an `id` and `type`.  If xCaliper were to convert a StatementRef to a generic Caliper `Event` certain required properties (i.e., `actor`, `action`, `object`, `endTime`) could not be set--a violation of the current model.
 
 ```
 {
@@ -390,7 +390,7 @@ or
 }
 ```
 
-Similarly, if `object.objectType` = "SubStatement" xCaliper can either map the xAPI Statement `object` to a generic Caliper `Event` or retain the xAPI type and provide an inline @context based on Jason Haag's draft [xAPI ontology](https://github.com/arwhyte/xapi-ontology/blob/master/ontology.rdf).  The xAPI SubStatement should include values for all required Caliper `Event` properties. 
+Similarly, if the `object.objectType` = "SubStatement" xCaliper can either map the xAPI Statement `object` to a generic Caliper `Event` or retain the xAPI type and provide an inline @context based on Jason Haag's draft [xAPI ontology](https://github.com/arwhyte/xapi-ontology/blob/master/ontology.rdf).  The xAPI SubStatement should include values for all required Caliper `Event` properties. 
 
 #### Statement `result` processing
 Unlike Caliper, xAPI provides its Statement with a top-level `result` property.  This sort of privileging is understandable given xAPI's SCORM antecedent and roots in corporate training where compliance is a key goal.  A Caliper `Result` is but one of a number of "generated" entities that may be produced during an interaction such as grading an assignment.  When xCaliper encounters an xAPI Statement `Result` it will map it to `Event.generated`.
