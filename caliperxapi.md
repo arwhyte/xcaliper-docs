@@ -209,17 +209,6 @@ As the Caliper information model evolves the number of defined actions will incr
 #### Statement `object` processing
 Likewise, various xAPI vocabularies define Activity types for use when the object of a Statement is an "Activity" rather than an `Agent`, `Group`, `Substatement` or `Statement Reference`.  Despite the confusing nomenclature an xAPI `Activity` is equivalent to a Caliper `Entity`.  Each xAPI Activity type is provisioned with a required `id` (type = IRI) and optional `objectType` (type = string of value "Activity") and `definition` object.  The `definition` or "Activity Definition Object" provides additional recommended and optional metadata about the Activity (see xAPI spec [2.4.4.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2441-when-the-objecttype-is-activity)).
 
-| xAPI | Type | Conformance | Caliper | Type | Conformance | Notes |
-| :--- | :--- | :---------- | :------ | :--- | :---------- | :---- |
-| `id` | UUID | Required | `Entity.id` | IRI | Required | Remap Activity identifier as urn:uuid\<UUID\>. |
-| `objectType` | string | Optional | &nbsp; | &nbsp; | &nbsp; | Utilize `definition.type` or type as a generic Caliper `Entity`. |
-| `definition` | Object | Optional | &nbsp; | &nbsp; | &nbsp; | Caliper: map attributes to various `Entity` properties. |
-| `definition.type` | IRI | Recommended | `Entity.type` | Required | If a mapping exists between the type and a Caliper `Entity` type use the Caliper type; otherwise use generic `Entity` type and add `Entity.extensions.xapi.definition.type`. |
-| `definition.name` | Language Map | Recommended | `Entity.name` | string | Optional | Caliper: either ignore the language map or store the key (e.g., "en-US") as `Entity.extensions.xapi.definition.name.key.languageTag`. |
-| `definition.description` | Language Map | Recommended | `Entity.description` | string | Optional | Caliper: either ignore the language map or store the key (e.g., "en-US") as `Entity.extensions.xapi.definition.description.key.languageTag`. |
-| `definition.moreInfo` | IRL | Optional | `Entity.extensions.xapi.definition.moreInfo` | &nbsp; | &nbsp; | "Resolves to a document with human-readable information about the Activity, which could include a way to launch the activity."|
-| `definition.extensions` | Object | Optional | `Entity.extensions` | Object | Optional | &nbsp; |
-
 The Rustici TinCan registry defines 110 Activity Types drawn principally from Rustici, W3C Activity Streams 1.0, and ADL.  A small set of additional verbs are drawn from a variety of commercial providers including Brindleway, HT2 Labs (Curatr), RISC and Andrew Downes among others.  In addition, W3C Activity Streams 2.0 defines 8 Core types, 5 Actor types, 12 Object types, and 1 Link Type.
 
 | &nbsp; | Caliper | ADL xAPI | Rustici xAPI | Activity Streams 2.0 | Activity Streams 1.0 | Others |
@@ -543,3 +532,17 @@ See xAPI Spec [2.4.6.2](https://github.com/adlnet/xAPI Spec/blob/master/xAPI-Dat
 `context.language`.  RFC 5646 code "representing the language in which the experience being recorded in this Statement (mainly) occurred in, if applicable and known."  See xAPI Spec [2.4.6](https://github.com/adlnet/xAPI Spec/blob/master/xAPI-Data.md#246-context).
 
 `context.statement`.  Another Statement to be considered as context for this Statement.  See xAPI Spec [Statement References](https://github.com/adlnet/xAPI Spec/blob/master/xAPI-Data.md#statement-references).
+
+
+#### Appendix B. xAPI Activity Type to Caliper Entity mappings
+
+| xAPI | Type | Conformance | Caliper | Type | Conformance | Notes |
+| :--- | :--- | :---------- | :------ | :--- | :---------- | :---- |
+| `id` | UUID | Required | `Entity.id` | IRI | Required | Remap Activity identifier as urn:uuid\<UUID\>. |
+| `objectType` | string | Optional | &nbsp; | &nbsp; | &nbsp; | Utilize `definition.type` or type as a generic Caliper `Entity`. |
+| `definition` | Object | Optional | &nbsp; | &nbsp; | &nbsp; | Caliper: map attributes to various `Entity` properties. |
+| `definition.type` | IRI | Recommended | `Entity.type` | IRI | Required | If a mapping exists between the type and a Caliper `Entity` type use the Caliper type; otherwise use generic `Entity` type and add `Entity.extensions.xapi.definition.type`. |
+| `definition.name` | Language Map | Recommended | `Entity.name` | string | Optional | Caliper: either ignore the language map or store the key (e.g., "en-US") as `Entity.extensions.xapi.definition.name.key.languageTag`. |
+| `definition.description` | Language Map | Recommended | `Entity.description` | string | Optional | Caliper: either ignore the language map or store the key (e.g., "en-US") as `Entity.extensions.xapi.definition.description.key.languageTag`. |
+| `definition.moreInfo` | IRL | Optional | `Entity.extensions.xapi.definition.moreInfo` | &nbsp; | &nbsp; | "Resolves to a document with human-readable information about the Activity, which could include a way to launch the activity."|
+| `definition.extensions` | Object | Optional | `Entity.extensions` | Object | Optional | &nbsp; |
