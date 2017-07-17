@@ -49,9 +49,29 @@ Goal of xCaliper is a syntatically compliant representation of an xAPI Statement
 For each statement
  
 #### Message Header processing
-xCaliper will inspect message headers . . . .  \[TODO: describe headers \]
+xCaliper will process both PUT (single statement) and POST (single statement, batch statements) HTTP requests.  Message headers will be inspected, in particular `Content-Type` and the custom `X-Experience-API-Version` request headers.  xAPI message requests normally set the `Content-Type` value to "application/json".  Statement requests that include Attachments use the "multipart/mixed" content type.
 
-xCaliper will process 1.0.x Statements only.  It will reject requests without a custom xAPI version header (pre xAPI version 0.95) or with a version header set to a value other than 1.0.0 unless such requests are routed to a fully conformant implementation of the prior version specified in the header (see xAPI Spec [2.4.10](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2410-version) and [3.3](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#versioning)).
+Regarding `Content-Type` handling xCaliper should consider adopting behaviors that mirror LRS requirements as described in the xAPI Spec, sections [1.5.1](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#15-content-types) and [1.5.2](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#152-multipartmixed):
+
+"application/json" document types
+
+* accept PUT or POST requests that include Statement batches containing either no Attachment objects or Attachment objects with a defined fileURL.
+
+"multipart/mixed" document types
+
+* accept PUT or POST requests that include Statement batches containing Attachments in the transmission format described in the xAPI spec.
+
+* reject PUT or POST requests that include Statement batches that include Attachments that lack a defined `fileURL` or fail to match a received Attachment part based on their hash.
+
+* assume a Content-Transfer-Encoding of binary for Attachment parts when receiving a PUT or POST requests.
+
+* reject Statement batches that are larger than xCaliper is configured to allow.
+
+* accept batches of Statements which contain no Attachment Objects when receiving a PUT or POST requests.
+
+* accept batches of Statements which contain only Attachment Objects with a populated `fileUrl` when receiving a PUT or POST requests.
+
+xCaliper will process 1.0.x Statements only.  The service will reject requests without a custom xAPI version header (pre xAPI version 0.95) or with a version header set to a value other than 1.0.0 unless such requests are routed to a fully conformant implementation of the prior version specified in the header (see xAPI Spec [2.4.10](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2410-version) and [3.3](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#versioning)).
 
 #### Discerning Event types
 Mapping an xAPI Statement to a Caliper `Event` subtype such as a `MessageEvent` is not a straightforward operation.  Unlike Caliper, which is explicit in its use of `Event` subtypes for descriptive purposes and as an aid to querying (e.g., `AssessmentEvent`, `MessageEvent` etc.), xAPI Statement "types" are defined optionally by specifying a `context.contextActivities` object typed with an array of one or more "category" object values.  Each category is defined as "an Activity used to categorize the Statement".  The array can be used to link a Statement to a profile such as cmi5 (see cmi5 9.6.2 [contextActivities](https://github.com/AICC/CMI-5_Spec_Current/blob/quartz/cmi5_spec.md#context_activities). 
