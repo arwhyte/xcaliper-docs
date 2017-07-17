@@ -31,22 +31,14 @@
 What is labeled and described in more detail throughout this proposed, is "xCaliper".  xCaliper is a service level solution that acts as a "proxy" or trasducer service, between a data collection/generator or "producer" end-point and a data consumption or "consumption" end-point, to transform any producer xAPI data collection API generated events to an IMS Caliper standardard JSON form stream received by the consumption end-point. This enables producer end-points to generate events in either using the xAPI statement and profile/"recipe" API, or the more semantic learning activity modeled IMS Caliper API, with all events serialized into a common IMS Caliper standard JSON formed stream transmitted to a target consumer end-point (i.e. LRS, RT analytics service etc).  Since the IMS Caliper event model and JSON structure is sufficiently equipped to support both xAPI's flexible non-standard events and Caliper's more semantically structured standardized events, this enables producers to utilize the data generation/collection API that is most effectice for their application while transmitting to consumption end-points as single IMS Caliper standard JSON stream for further processing.  Consumption end-points therefore remain opaque to and therefore need not specialize handling for any differing producer API utilized.  Applications that currently use the xAPI API to collect/generate data because it is sufficient for the end-to-end transmission needed, can continue to do so with the xCaliper service enabled if the consumption end-point is required also to handle IMS Caliper collected/generated events as well.  Also, if an xAPI producer application has additional requirements that warrant the usage of the more semantically enabled and extensible, learning activity modeled IMS Caliper API, this can easily be introduced by the producer without concern over having to transform respective JSON transmission streams to aiign with the consumption end-point targeted. 
 
 #### Expected Market Impact for xCaliper
-**_<<Need to summarize the expected market facing impact of taking an initial step with xCapiper to first and foremost provide a unified "bridge" for xAPI to be supported as seamlessly and lossless as possible within the Caliper overarching event model and JSON stream framework.  In essense providing a compatibility for xAPI within Caliper so that producers and consumers can rely on the Caliper superset and standard as the unifying framework going forward especially when both xAPI and Caliper implementation support is required simultaneously to support the requiremens >>_**
+*\[Need to summarize the expected market facing impact of taking an initial step with xCapiper to first and foremost provide a unified "bridge" for xAPI to be supported as seamlessly and lossless as possible within the Caliper overarching event model and JSON stream framework.  In essense providing a compatibility for xAPI within Caliper so that producers and consumers can rely on the Caliper superset and standard as the unifying framework going forward especially when both xAPI and Caliper implementation support is required simultaneously to support the requiremens\]*
 
-## The xCaliper Technical Solution
+### The xCaliper Technical Solution
 **_<<Suggest that we re-orient this section to effectively outline the technical solution proposed to leverage Caliper event model and JSON as the backbone superset to enable a bridge for supporting in parallel xAPI statement and "recipe"/profile generated / collected data transmitted via Caliper JSON to a Caliper supporting end-point >>_**
 
+### xCaliper service behavior
 
-### xCaliper service requirements
-
-Goal of xCaliper is a syntatically compliant representation of an xAPI Statement as a Caliper Event.  
-
-
-1. Process both single and a batched set of xAPI statements
-2. Accept PUT (single statement), POST (single statement, batch statements)
-3. Check the Request headers for Content-Type, X-Experience-API-Version, etc.
-
-For each statement
+xCaliper will provide a conversion service designed to transform xAPI statements into Caliper events.  Converted Statements will be expressed as JSON-LD.  Caliper terms will supercede xAPI terms whenever exact match and near match mappings exist.  In certain cases, xAPI Activity types and verbs will be retained in order to preserve Statement semantics across the conversion.  This may result in statement-to-event conversions that extend existing Caliper controlled vocabularies.      
  
 #### Message Header processing
 xCaliper will process both PUT (single statement) and POST (single statement, batch statements) HTTP requests.  Message headers will be inspected, in particular `Content-Type` and the custom `X-Experience-API-Version` request headers.  xAPI message requests normally set the `Content-Type` value to "application/json".  Statement requests that include Attachments use the "multipart/mixed" content type.
@@ -71,7 +63,7 @@ Regarding `Content-Type` handling xCaliper should consider adopting behaviors th
 
 * accept batches of Statements which contain only Attachment Objects with a populated `fileUrl` when receiving a PUT or POST requests.
 
-xCaliper will process 1.0.x Statements only.  The service will reject requests without a custom xAPI version header (pre xAPI version 0.95) or with a version header set to a value other than 1.0.0 unless such requests are routed to a fully conformant implementation of the prior version specified in the header (see xAPI Spec [2.4.10](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2410-version) and [3.3](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#versioning)).
+xCaliper will process 1.0.x Statements only.  The service will reject requests without a custom xAPI version header (pre xAPI version 0.95) or with a version header set to a value other than "1.0.0" unless such requests are routed to a fully conformant implementation of the prior version specified in the header (see xAPI Spec [2.4.10](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Data.md#2410-version) and [3.3](https://github.com/adlnet/xAPI-Spec/blob/master/xAPI-Communication.md#versioning)).
 
 #### Discerning Event types
 Mapping an xAPI Statement to a Caliper `Event` subtype such as a `MessageEvent` is not a straightforward operation.  Unlike Caliper, which is explicit in its use of `Event` subtypes for descriptive purposes and as an aid to querying (e.g., `AssessmentEvent`, `MessageEvent` etc.), xAPI Statement "types" are defined optionally by specifying a `context.contextActivities` object typed with an array of one or more "category" object values.  Each category is defined as "an Activity used to categorize the Statement".  The array can be used to link a Statement to a profile such as cmi5 (see cmi5 9.6.2 [contextActivities](https://github.com/AICC/CMI-5_Spec_Current/blob/quartz/cmi5_spec.md#context_activities). 
