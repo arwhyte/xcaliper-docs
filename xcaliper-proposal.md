@@ -2,9 +2,9 @@
 #### Premise
 * There is clearly no benefit to having two overlapping edu focused, RDF triple event structured, data collection APIs out there.
  
-* xAPI, because of its flexibility and non-standard conformance approach to collecting different, endpoint agreed upon, custom streams of data, and the availability in the market prior to Caliper, has gotten some early adoption traction in the edu space.
+* xAPI has gotten some adoption traction in the edu space, because of its flexibility and non-standard conformance approach to collecting different, endpoint agreed upon, custom streams of data, and its  availability in the market prior to Caliper.
  
-* A majority of xAPI usage focuses on non-standard, custom endpoint agreed upon exchanges of event streams consisting of more basic event data.
+* A majority of xAPI usage, leveraging its flexible creation and/or use of vocabulary and activity types,  focuses on non-standard, custom endpoint agreed upon exchanges of event streams consisting of more basic event data.
 
 * xAPI "profiles" or "recipes" are fairly new and do not cover the entire learning activity spectrum in detail or in an extensible,  semantically modeled form, but are a useful mechanism for aggregating a collection of data elements for a more well defined and consistent target scenario such as Assessment, Video etc.
 
