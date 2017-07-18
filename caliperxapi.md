@@ -418,7 +418,39 @@ to
 
 #### Statement `context` processing
 
-\[TODO\]
+The xAPI Statement `context` property attempts to capture portions of the learning context in which a Statement is situated.  All xAPI `context` properties are considered optional.  xCaliper will copy the `context` as is to `Event.extensions` if provided.  Certain property values could be extracted from the Statement `context` and mapped to various Caliper `Event` properties as is noted below.  
+
+| xAPI | Type | Description |
+| :--- | :--- | :------------ |
+| `context.registration` | UUID | The registration identifier of a Context object.  Copy to `Event.extensions` |
+| `context.instructor` | Agent or Group | Copy to `Event.extensions.xapi.context`.  Assuming `Event.group` is a course the `instructor` could also be added to the `CourseOffering`/`CourseSection` `extensions` property. |
+| `context.team` | Group | Copy to `Event.extensions`.  The `team` value could also be mapped to `Event.membership.organization` (although xAPI does not appear to model an individual member's role or status). |
+| `context.contextActivities` | ContextActivities Object | Copy to `Event.extensions`.  Four context types are defined: "parent", "grouping", "category" and "other", each expressed as an array of values.  If a parent Activity is described and can be converted to a Caliper `DigitalResource` or `Organization` then map the parent to the Caliper `isPartOf` or `subOrganizationOf` property.  If a category Activity is described that links to an xAPI profile or receipe xCaliper may be able to map the Statement to a particular `Event` type based on the reference. |
+| `context.revision` | string | `Event.extensions`.  If the Statement `object` is an Activity that can be mapped to a Caliper `DigitalResource` the `revision` value can also be mapped to `DigitalResource.version`. |
+| `context.platform` | string | Copy to `Event.extensions`.  Unfortunately since there is no xAPI requirement that the `platform` value be expressed as an IRI there is no way to convert the value to a Caliper `SoftwareApplication` and map it to `Event.edApp`. |
+| `context.language` | string | RFC 5646 language code.  Copy to `Event.extensions`. |
+| `context.statement` | Statement Reference | Another Statement considered as context for this Statement. Copy to `Event.extensions`. |
+| `context.extensions` | Object | A map of other domain-specific context relevant to the Statement.  Copy to `Event.extensions`. |
+
+```
+{
+  "extensions": {
+    "xapi": {
+      "context": {
+        "registration": "UUID",
+        "instructor": {},
+        "team": {},
+        "contextActivities": {},
+        "revision": "",
+        "platform": "",
+        "language": "",
+        "statement": "",
+        "extensions": {}
+      }
+    }
+  }
+}
+```
 	
 #### Statement `timestamp` processing
 xAPI Statement providers are not required to provide a timestamp (the LRS must set it if not provided).  If a timestamp is provided xCaliper will map it to `Event.eventTime` as an ISO 8601 formatted date time string value.  If the Statement is not provisioned with a timestamp xCaliper will generate and assign an `eventTime`, perhaps with a reference to the date time assignment in a changeLog object in `Event.extensions.` 
