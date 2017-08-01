@@ -49,7 +49,7 @@ xCaliper will provide a conversion service designed to transform xAPI statements
 
 Mapping xAPI vocabularies to Caliper terms will require the establishment and maintenance of data dictionaries or mapping files.  Defining and publishing equivalencies between terms (perhaps using the SKOS vocabulary [mapping properties](https://www.w3.org/TR/skos-reference/#mapping)) should be included in the scope of the proposed IMS "Profiles Registry".  Indeed, we recommend that IMS propose to Rustici that they consider retiring their commercial-backed registry in favor of an IMS-sponsored replacement. 
 
-What follows is a preliminary walkthrough of likely xCaliper behavior with respect to xAPI message header and statement property processing with example JSON / JSON-LD.     
+What follows is a preliminary walkthrough of likely xCaliper behavior with respect to xAPI message header and statement property processing with example JSON / JSON-LD.  For a visualization of xAPI Statement processing see [Appendix A](#appendixA) below.     
  
 #### Message Header processing
 xCaliper will process both PUT (single statement) and POST (single statement, batch statements) HTTP requests.  Message headers will be inspected, in particular `Content-Type` and the custom `X-Experience-API-Version` request headers.  xAPI message requests normally set the `Content-Type` value to "application/json".  Statement requests that include Attachments use the "multipart/mixed" content type.
@@ -550,6 +550,7 @@ to
 
 \[TODO: describe \]
 
+<a name="appendixA" />
 
 ### Appendix A.  xCaliper Statement Processing Diagram
 
