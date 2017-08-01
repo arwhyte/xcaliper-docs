@@ -554,4 +554,4 @@ to
 
 ### Appendix A.  xCaliper Statement Processing Diagram
 
-![xCaliper Statement Processing Diagram](/assets/xcaliper-workflow-v01.png)
+![xCaliper Statement Processing Diagram](assets/xcaliper-workflow-v01.png)
