@@ -547,3 +547,8 @@ to
 #### Statement `attachments` processing
 
 \[TODO: describe \]
+
+
+### Appendix A.  xCaliper Statement Processing Diagram
+
+![xCaliper Statement Processing Diagram](/assets/xcaliper-workflow-v01.png)
