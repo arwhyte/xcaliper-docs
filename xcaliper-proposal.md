@@ -33,7 +33,9 @@
 #### What is xCaliper ?
 
 xCaliper is a service level solution that acts as a "proxy" or transducer service between a data collection/generator or "producer" endpoint and a data consumption or "consumption" endpoint.  xCaliper will transform producer generated xAPI data statements to an IMS Caliper JSON-LD form stream received by the consuming endpoint. This enables producer endpoints to generate events using the xAPI statement and profile/"recipe" API or the more semantically-rich learning activity modeled IMS Caliper API, with all events serialized into a common IMS Caliper standard JSON-LD formed stream transmitted to a target consumer endpoint (i.e. LRS, RT analytics service, etc).
-  
+
+![Figure 1 - xCaliper Overview](assets/xcaliper-overview.png?raw=true)
+
 Since the IMS Caliper event model and JSON-LD structure is sufficiently equipped to support both xAPI's flexible non-standard events and Caliper's more semantically structured standardized events, this enables producers to utilize the data generation/collection API that is most effective for their application while transmitting to consumption endpoints as single IMS Caliper standard JSON stream for further processing. Consumption endpoints therefore remain opaque to and therefore need not provide specialize handling for any differing producer API utilized.  Applications that currently use the xAPI API to collect/generate data because it is sufficient for the end-to-end transmission needed, can continue to do so with the xCaliper service enabled if the consumption endpoint is required also to handle IMS Caliper collected/generated events as well.  Also, if an xAPI producer application has additional requirements that warrant the usage of the more semantically enabled and extensible, learning activity modeled IMS Caliper API, this can easily be introduced by the producer without concern over having to transform respective JSON transmission streams to align with the consumption endpoint targeted.
  
 
