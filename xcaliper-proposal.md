@@ -1,4 +1,4 @@
-## xCaliper - A Proposal for Aligning Caliper and xAPI 
+## xCaliper - A Proposal 
 
 ### Chris Vento and Anthony Whyte
 
